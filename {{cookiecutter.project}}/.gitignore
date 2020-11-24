@@ -1,4 +1,27 @@
-*.png
-*.pyc
+# exclude everything except subdirectories
+*
 
-bash_history
+# except these
+!/*
+!scripts/*
+!src/**
+# !src/*/*
+!reports/*
+!data/capturesettings/**
+!data/**.csv
+!output/*
+!output/*/*.json
+#do not include output .csv files!
+#do not put comments on same line as exceptions!
+# use git lfs track /output/*/*.json to version json output files
+
+*.config
+.R*
+!*.Rmd
+*.log
+*.ipynb
+*.pyc
+.Rproj.user
+*.html
+*.pdf
+.history/

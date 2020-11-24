@@ -11,5 +11,5 @@ The bulk of files required to start an image analysis project can be generated u
 the command below.
 
 ```
-$ cookiecutter gh:JIC-Image-Analysis/cookiecutter-image-analysis
+$ cookiecutter gh:CougPhenomics/cookiecutter-phenomics
 ```

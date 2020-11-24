@@ -3,7 +3,6 @@
 name: {{ cookiecutter.project }}
 version: {{ cookiecutter.version }}
 authors:
-  - Matthew Hartley
-  - Tjelvar Olsson
+  - Dominik Schneider
 start: {{ cookiecutter.start }}
 end: sometime
