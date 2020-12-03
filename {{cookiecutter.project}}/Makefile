@@ -49,11 +49,26 @@ help : Makefile
 
 
 ## build			: build plantcv docker image
-.PHONY : build
 build : | environment.yml
-
 environment.yml :
 	./build_docker.sh
+
+# use the name of the current directory as the docker image tag
+DOCKER_TAG ?= $(shell echo ${PWD} | rev | cut -d/ -f1 | rev)
+DOCKER_USERNAME = dschneiderch
+DOCKER_IMAGE = ${DOCKER_USERNAME}/${DOCKER_REPO}:${DOCKER_TAG}
+
+## dev				: launch jupyter lab to adjust plantcv scripts
+dev : build
+	docker run --rm -p 8888:8888 \
+		--name=${DOCKER_TAG} \
+		-v `pwd`/bash_history:/home/jovyan/.bash_history -v `pwd`/data:/home/jovyan/work/data:ro -v `pwd`/scripts:/home/jovyan/work/scripts:ro -v `pwd`/output:/home/jovyan/work/output \
+		${DOCKER_TAG} \
+		start.sh jupyter lab
+
+## stop					: stop docker container
+stop :
+	docker stop ${DOCKER_TAG}
 
 
 ## getvis			: append new VIS images from lemnatec database
