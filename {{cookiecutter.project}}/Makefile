@@ -48,6 +48,14 @@ help : Makefile
 	@sed -n 's/^##//p' $<
 
 
+## build			: build plantcv docker image
+.PHONY : build
+build : | environment.yml
+
+environment.yml :
+	./build_docker.sh
+
+
 ## getvis			: append new VIS images from lemnatec database
 # there is no way to to check the filesystem for a dependency but this script will only download new images
 .PHONY : getvis
