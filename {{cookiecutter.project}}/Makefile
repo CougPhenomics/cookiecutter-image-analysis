@@ -6,7 +6,7 @@ ENDDATE = 2020-06-05
 
 # Configs
 OUTDIR = output
-SERVER_CONFIG = ../cppcserver.config
+SERVER_CONFIG = $(MY_SERVER_CONFIG) #../cppcserver.config
 DATAQUALITY_OUT = reports/PostProcessing.html
 DATAQUALITY_SRC = reports/PostProcessing.Rmd
 DEVIATION_OUT = reports/deviationheatmaps.html
@@ -47,28 +47,40 @@ help : Makefile
 	@echo Use this file to keep results updated. Required user configuration at top of the file are experiment name - EXPER - and STARTDATE and ENDDATE. See available targets below.
 	@sed -n 's/^##//p' $<
 
-
 ## build			: build plantcv docker image
-build : | environment.yml
-environment.yml :
+build :
 	./build_docker.sh
 
 # use the name of the current directory as the docker image tag
 DOCKER_TAG ?= $(shell echo ${PWD} | rev | cut -d/ -f1 | rev)
+PROJECT_NAME = $(notdir $(PWD))
 DOCKER_USERNAME = dschneiderch
 DOCKER_IMAGE = ${DOCKER_USERNAME}/${DOCKER_REPO}:${DOCKER_TAG}
 
-## dev				: launch jupyter lab to adjust plantcv scripts
+result = $(shell docker ps -f name=$(PROJECT_NAME) -q | wc -l)
+## dev				: launch jupyter instance for prototyping and modifying plantcv workflow scripts
 dev : build
-	docker run --rm -p 8888:8888 \
-		--name=${DOCKER_TAG} \
-		-v `pwd`/bash_history:/home/jovyan/.bash_history -v `pwd`/data:/home/jovyan/work/data:ro -v `pwd`/scripts:/home/jovyan/work/scripts:ro -v `pwd`/output:/home/jovyan/work/output \
-		${DOCKER_TAG} \
-		start.sh jupyter lab
+	@echo $(PROJECT_NAME)
+	@echo $(result)
+ifneq ($(result),1)
+	docker restart $(PROJECT_NAME)
+else
+	docker run -p 8888:8888 \
+		-d \
+		--name=$(PROJECT_NAME) \
+		--env 'MY_SERVER_CONFIG=$(shell cat ../cppcserver.config)' \
+		-v `pwd`/bash_history:/home/jovyan/.bash_history -v `pwd`/data:/home/jovyan/work/data -v `pwd`/scripts:/home/jovyan/work/scripts -v `pwd`/output:/home/jovyan/work/output \
+		$(PROJECT_NAME) \
+		start.sh jupyter lab --NotebookApp.token='' --NotebookApp.password=''
+endif
 
-## stop					: stop docker container
-stop :
-	docker stop ${DOCKER_TAG}
+## shell			: launch bash shell to make full analysis
+shell : build
+	docker run --rm -it \
+		--name=${DOCKER_TAG} \
+		-v `pwd`/bash_history:/home/jovyan/.bash_history -v ${PWD}/data:/home/jovyan/work/data -v ${PWD}/scripts:/home/jovyan/work/scripts -v `pwd`/output:/home/jovyan/work/output \
+		${DOCKER_TAG} \
+		bash
 
 
 ## getvis			: append new VIS images from lemnatec database
