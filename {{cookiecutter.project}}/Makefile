@@ -62,7 +62,7 @@ result = $(shell docker ps -f name=$(PROJECT_NAME) -q | wc -l)
 dev : build
 	@echo $(PROJECT_NAME)
 	@echo $(result)
-ifneq ($(result),1)
+ifeq ($(result),1)
 	docker restart $(PROJECT_NAME)
 else
 	docker run -p 8888:8888 \
