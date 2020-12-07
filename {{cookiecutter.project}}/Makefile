@@ -61,7 +61,6 @@ result = $(shell docker ps -f name=$(PROJECT_NAME) -q | wc -l)
 ## dev				: launch jupyter instance for prototyping and modifying plantcv workflow scripts
 dev : build
 	@echo $(PROJECT_NAME)
-	@echo $(result)
 ifeq ($(result),1)
 	docker restart $(PROJECT_NAME)
 else
