@@ -57,11 +57,11 @@ PROJECT_NAME = $(notdir $(PWD))
 DOCKER_USERNAME = dschneiderch
 DOCKER_IMAGE = ${DOCKER_USERNAME}/${DOCKER_REPO}:${DOCKER_TAG}
 
-result = $(shell docker ps -f name=$(PROJECT_NAME) -q | wc -l)
 ## dev				: launch jupyter instance for prototyping and modifying plantcv workflow scripts
 dev : build
-	@echo $(PROJECT_NAME)
-	@echo $(result)
+result = $(shell docker ps -f name=$(PROJECT_NAME) -q | wc -l)
+	# @echo $(PROJECT_NAME)
+	# @echo $(result)
 ifeq ($(result),1)
 	docker restart $(PROJECT_NAME)
 else
