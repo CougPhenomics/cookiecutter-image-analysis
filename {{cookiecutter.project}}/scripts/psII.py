@@ -1,3 +1,5 @@
+"""{{ cookiecutter.project }} PSII analysis."""
+
 # %% Setup
 # Export .png to outdir from LemnaBase using LT-db_extractor.py
 from plantcv import plantcv as pcv
@@ -13,7 +15,6 @@ import importlib
 from skimage import filters
 from skimage import morphology
 from skimage import segmentation
-
 
 # from tinydb import TinyDB, Query
 
@@ -65,9 +66,10 @@ pcv.params.debug = 'plot'  # 'print' #'plot', 'None'
 # Figures will show 9x9inches which fits my monitor well.
 plt.rcParams["figure.figsize"] = (9, 9)
 # plt.rcParams["font.family"] = "Arial"  # All text is Arial
-ilegend=1
+ilegend = 1
 
 # %% The main analysis function
+
 
 # This function takes a dataframe of metadata that was created above. We loop through each pair of images to compute photosynthetic parameters
 def image_avg(fundf):
@@ -154,16 +156,15 @@ def image_avg(fundf):
         # local_otsu = filters.rank.otsu(img, pcv.get_kernel((9,9), 'rectangle'))#morphology.disk(2))
         # thresh_image = img >= local_otsu
 
-
         #_------>
         elevation_map = filters.sobel(img)
         # pcv.plot_image(elevation_map)
         thresh = filters.threshold_otsu(image=img)
         # thresh = 50
 
-        markers = np.zeros_like(img, dtype = 'uint8')
-        markers[img > thresh+8] = 2
-        markers[img <= thresh+8] = 1
+        markers = np.zeros_like(img, dtype='uint8')
+        markers[img > thresh + 8] = 2
+        markers[img <= thresh + 8] = 1
         # pcv.plot_image(markers,cmap=plt.cm.nipy_spectral)
 
         mask = segmentation.watershed(elevation_map, markers)
@@ -179,11 +180,11 @@ def image_avg(fundf):
         # pcv.plot_image(mask, cmap=plt.cm.nipy_spectral)
         # <-----------
         roi_c, roi_h = pcv.roi.multi(img,
-                                    coord=(250, 200),
-                                    radius=70,
-                                    spacing=(0, 220),
-                                    ncols=1,
-                                    nrows=2)
+                                     coord=(250, 200),
+                                     radius=70,
+                                     spacing=(0, 220),
+                                     ncols=1,
+                                     nrows=2)
 
         if len(np.unique(mask)) == 1:
             c = []
@@ -199,10 +200,10 @@ def image_avg(fundf):
 
             # compute fv/fm and save to file
             YII, hist_fvfm = pcv.photosynthesis.analyze_fvfm(fdark=fdark,
-                                        fmin=imgmin,
-                                        fmax=img,
-                                        mask=mask,
-                                        bins=128)
+                                                             fmin=imgmin,
+                                                             fmax=img,
+                                                             mask=mask,
+                                                             bins=128)
             # YII = np.divide(Fv,
             #                 img,
             #                 out=out_flt.copy(),
@@ -227,10 +228,10 @@ def image_avg(fundf):
         else:
             # compute YII
             YII, hist_yii = pcv.photosynthesis.analyze_fvfm(fdark,
-                                        fmin=imgmin,
-                                        fmax=img,
-                                        mask=newmask,
-                                        bins=128)
+                                                            fmin=imgmin,
+                                                            fmax=img,
+                                                            mask=newmask,
+                                                            bins=128)
             # make sure to initialize with out=. using where= provides random values at False pixels. you will get a strange result. newmask comes from Fm instead of Fm' so they can be different
             #newmask<0, img>0 = FALSE: not part of plant but fluorescence detected.
             #newmask>0, img<=0 = FALSE: part of plant in Fm but no fluorescence detected <- this is likely the culprit because pcv.apply_mask doesn't always solve issue.
@@ -247,9 +248,9 @@ def image_avg(fundf):
                             out=out_flt.copy(),
                             where=np.logical_and(newmask > 0, img > 0))
             NPQ = np.subtract(NPQ,
-                            1,
-                            out=out_flt.copy(),
-                            where=np.logical_and(NPQ >= 1, newmask > 0))
+                              1,
+                              out=out_flt.copy(),
+                              where=np.logical_and(NPQ >= 1, newmask > 0))
 
         # cv2.imwrite(os.path.join(fmaxdir, outfn + '-yii.tif'), YII)
         # cv2.imwrite(os.path.join(fmaxdir, outfn + '-npq.tif'), NPQ)
@@ -372,40 +373,48 @@ def image_avg(fundf):
                                                     max_value=2.5,
                                                     background='black',
                                                     obj_padding=0)
-                npq_img = cppc.viz.add_scalebar(npq_img,
-                                                    pixelresolution=cppc.pixelresolution,
-                                                    barwidth=10,
-                                                    barlabel='1 cm',
-                                                    barlocation='lower left')
+                npq_img = cppc.viz.add_scalebar(
+                    npq_img,
+                    pixelresolution=cppc.pixelresolution,
+                    barwidth=10,
+                    barlabel='1 cm',
+                    barlocation='lower left')
                 # If you change the output size and resolution you will need to adjust the timelapse video script
-                npq_img.set_size_inches(6,6, forward=False)
-                npq_img.savefig(os.path.join(imgdir, outfn_roi + '-NPQ.png'),
-                                bbox_inches='tight',
-                                dpi=100)#100 is default for matplotlib/plantcv
-                if ilegend == 1:#only need to print legend once
-                    npq_img.savefig(os.path.join(imgdir, 'npq_legend.pdf'), bbox_inches='tight')
+                npq_img.set_size_inches(6, 6, forward=False)
+                npq_img.savefig(
+                    os.path.join(imgdir, outfn_roi + '-NPQ.png'),
+                    bbox_inches='tight',
+                    dpi=100)  #100 is default for matplotlib/plantcv
+                if ilegend == 1:  #only need to print legend once
+                    npq_img.savefig(os.path.join(imgdir, 'npq_legend.pdf'),
+                                    bbox_inches='tight')
                 npq_img.clf()
 
-                yii_img = pcv.visualize.pseudocolor(YII,
-                                                    obj=None,
-                                                    mask=plant_mask,
-                                                    cmap='gist_rainbow',#custom_colormaps.get_cmap(
-                                                        # 'imagingwin')#
-                                                    axes=False,
-                                                    min_value=0,
-                                                    max_value=1,
-                                                    background='black',
-                                                    obj_padding=0)
-                yii_img = cppc.viz.add_scalebar(yii_img,
-                                                    pixelresolution=cppc.pixelresolution,
-                                                    barwidth=10,
-                                                    barlabel='1 cm',
-                                                    barlocation='lower left')
+                yii_img = pcv.visualize.pseudocolor(
+                    YII,
+                    obj=None,
+                    mask=plant_mask,
+                    cmap='gist_rainbow',  #custom_colormaps.get_cmap(
+                    # 'imagingwin')#
+                    axes=False,
+                    min_value=0,
+                    max_value=1,
+                    background='black',
+                    obj_padding=0)
+                yii_img = cppc.viz.add_scalebar(
+                    yii_img,
+                    pixelresolution=cppc.pixelresolution,
+                    barwidth=10,
+                    barlabel='1 cm',
+                    barlocation='lower left')
                 yii_img.set_size_inches(6, 6, forward=False)
-                yii_img.savefig(os.path.join(imgdir, outfn_roi + '-YII.png'), bbox_inches='tight', dpi=100)
-                if ilegend == 1:#print legend once and increment ilegend  to stop in future iterations
-                    yii_img.savefig(os.path.join(imgdir, 'yii_legend.pdf'), bbox_inches='tight')
-                    ilegend = ilegend+1
+                yii_img.savefig(os.path.join(imgdir, outfn_roi + '-YII.png'),
+                                bbox_inches='tight',
+                                dpi=100)
+                if ilegend == 1:  #print legend once and increment ilegend  to stop in future iterations
+                    yii_img.savefig(os.path.join(imgdir, 'yii_legend.pdf'),
+                                    bbox_inches='tight')
+                    ilegend = ilegend + 1
                 yii_img.clf()
 
             # end try-except-else
@@ -442,7 +451,6 @@ def image_avg(fundf):
 
     return (outdf)
 
-
     # end of function!
 
 
@@ -458,7 +466,9 @@ if pcv.params.debug == 'print':
 
 # %% Testing dataframe
 # # If you need to test new function or threshold values you can subset your dataframe to analyze some images
-df2 = df.query('(plantbarcode=="A4") and (parameter == "FvFm" or parameter == "t300_ALon" or parameter == "t80_ALon") and (jobdate == "2020-06-01")')
+df2 = df.query(
+    '(plantbarcode=="A4") and (parameter == "FvFm" or parameter == "t300_ALon" or parameter == "t80_ALon") and (jobdate == "2020-06-01")'
+)
 # df2 = df.query('(plantbarcode=="A1") and (parameter == "FvFm" or parameter == "t300_ALon") and (jobdate == "2020-03-13")')# | (plantbarcode == "B7" & jobdate == "2019-11-20")')
 # fundf = df2.query('(plantbarcode == "A1" and parameter=="FvFm" and jobdate == "2020-05-30")')
 # del fundf
@@ -479,7 +489,7 @@ else:
 # heterodb.all()
 # Each unique combination of treatment, plantbarcode, jobdate, parameter should result in exactly 2 rows in the dataframe that correspond to Fo/Fm or F'/Fm'
 dfgrps = df2.groupby(['experiment', 'plantbarcode', 'jobdate', 'parameter'])
-ilegend=1
+ilegend = 1
 grplist = []
 for grp, grpdf in dfgrps:
     # print(grp)#'%s ---' % (grp))
@@ -491,9 +501,8 @@ df_avg = pd.concat(grplist)
 # # %% Add genotype information
 gtypeinfo = pd.read_csv(os.path.join('data', 'genotype_map.csv'),
                         skipinitialspace=True)
-df_avg2 = (pd.merge(df_avg, gtypeinfo, on=['plantbarcode', 'roi'], how='inner'))
-
-
+df_avg2 = (pd.merge(df_avg, gtypeinfo, on=['plantbarcode', 'roi'],
+                    how='inner'))
 
 # %% Write the tabular results to file!
 # df_avg2.jobdate = df_avg2.jobdate.dt.strftime('%Y-%m-%d')
@@ -503,6 +512,5 @@ df_avg2 = (pd.merge(df_avg, gtypeinfo, on=['plantbarcode', 'roi'], how='inner'))
                                  na_rep='nan',
                                  float_format='%.4f',
                                  index=False))
-
 
 # %%

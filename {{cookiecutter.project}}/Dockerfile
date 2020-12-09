@@ -3,5 +3,5 @@ FROM danforthcenter/plantcv
 
 RUN pip install cppcpyutils
 
-COPY ./Makefile /home/jovyan/work/
+COPY ./plantcv.Makefile /home/jovyan/work/Makefile
 COPY ./renderRmd.r /home/jovyan/work/
