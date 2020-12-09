@@ -1,12 +1,12 @@
 # Windows User --> If your R_USER directory is not C:\Users\<username>\Documents (which is the default) then you need to change it below
 # Required Inputs	: experiment name, start/end dates
-EXPER = doi
+EXPER = {{cookiecutter.project}}
 STARTDATE = 2020-05-31
 ENDDATE = 2020-06-05
 
 # Configs
 OUTDIR = output
-SERVER_CONFIG = $(MY_SERVER_CONFIG) #../cppcserver.config
+SERVER_CONFIG = ../cppcserver.config
 DATAQUALITY_OUT = reports/PostProcessing.html
 DATAQUALITY_SRC = reports/PostProcessing.Rmd
 DEVIATION_OUT = reports/deviationheatmaps.html
@@ -57,20 +57,21 @@ PROJECT_NAME = $(notdir $(PWD))
 DOCKER_USERNAME = dschneiderch
 DOCKER_IMAGE = ${DOCKER_USERNAME}/${DOCKER_REPO}:${DOCKER_TAG}
 
-result = $(shell docker ps -f name=$(PROJECT_NAME) -q | wc -l)
 ## dev				: launch jupyter instance for prototyping and modifying plantcv workflow scripts
 dev : build
 	@echo $(PROJECT_NAME)
+	$(eval result = $(shell docker ps -f name=$(PROJECT_NAME) -q | wc -l))
 ifeq ($(result),1)
 	docker restart $(PROJECT_NAME)
 else
 	docker run -p 8888:8888 \
 		-d \
 		--name=$(PROJECT_NAME) \
-		--env 'MY_SERVER_CONFIG=$(shell cat ../cppcserver.config)' \
 		-v `pwd`/bash_history:/home/jovyan/.bash_history -v `pwd`/data:/home/jovyan/work/data -v `pwd`/scripts:/home/jovyan/work/scripts -v `pwd`/output:/home/jovyan/work/output \
 		$(PROJECT_NAME) \
 		start.sh jupyter lab --NotebookApp.token='' --NotebookApp.password=''
+	docker cp ../cppcserver.config $(PROJECT_NAME):/home/jovyan/
+
 endif
 
 ## shell			: launch bash shell to make full analysis
