@@ -1,20 +1,17 @@
 
 # use the name of the current directory as the docker image tag
-# DOCKER_TAG ?= $(shell echo ${PWD} | rev | cut -d/ -f1 | rev)
 PROJECT_NAME = $(notdir $(PWD))
-# DOCKER_USERNAME = dschneiderch
-# DOCKER_IMAGE = ${DOCKER_USERNAME}/${DOCKER_REPO}:${DOCKER_TAG}
 container_running = $(shell docker ps -f name=$(PROJECT_NAME) -f status=running -q) # see if there are running containers rather than waiting for build and fail
 container_exists = $(shell docker ps -a -f name=$(PROJECT_NAME) -q) # see if there are running containers rather than waiting for build and fail
 
 
 .PHONY : help
 help : Makefile
-	@echo Use this file to simplify docker interaction. See available targets below.
+	@echo Use this file to simplify docker interaction. See available targets below. 'docker ps -a' to see containers.
 	@sed -n 's/^##//p' $<
 
 
-## build	: build plantcv docker image
+## build			: build plantcv docker image
 .PHONY : build
 build :
 	@echo Building $(PROJECT_NAME)...

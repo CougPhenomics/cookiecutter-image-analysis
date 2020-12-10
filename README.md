@@ -1,9 +1,11 @@
-# Cookiecutter image analysis project template
+# Cookiecutter Phenomics project template
 
 
 ## Dependencies
 
-Requires [Cookiecutter](http://cookiecutter.readthedocs.io/) version 1.4 or greater.
+- git
+- python>=3.6
+- [Cookiecutter](http://cookiecutter.readthedocs.io/) version 1.4 or greater.
 
 ## Usage
 
