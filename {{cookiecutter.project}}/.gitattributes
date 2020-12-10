@@ -1,2 +1,4 @@
 output/vis/results.json filter=lfs diff=lfs merge=lfs -text
 output/vis/vis.json filter=lfs diff=lfs merge=lfs -text
+
+* text=auto
