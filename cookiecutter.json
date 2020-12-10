@@ -1,5 +1,5 @@
 {
-  "project": "{{cookiecutter.project}}",
+  "project": "{cougphenomics}",
   "version": "0.1.0",
   "start": "{% now 'utc', '%Y-%m-%d' %}",
   "_extensions": ["jinja2_time.TimeExtension"]
