@@ -1,8 +1,9 @@
 
 # use the name of the current directory as the docker image tag
 PROJECT_NAME = $(notdir $(PWD))
-container_running = $(shell docker ps -f name=$(PROJECT_NAME) -f status=running -q) # see if there are running containers rather than waiting for build and fail
-container_exists = $(shell docker ps -a -f name=$(PROJECT_NAME) -q) # see if there are running containers rather than waiting for build and fail
+DOCKERTAG = $(shell echo $(PROJECT_NAME) | tr '[:upper:]' '[:lower:]') #LOWERCASE DOCKERTAG
+container_running = $(shell docker ps -f name=$(DOCKERTAG) -f status=running -q) # see if there are running containers rather than waiting for build and fail
+container_exists = $(shell docker ps -a -f name=$(DOCKERTAG) -q) # see if there are running containers rather than waiting for build and fail
 
 
 .PHONY : help
@@ -28,13 +29,13 @@ dev :
 ifeq ($(strip $(container_exists)),) # don't launch if container exists
 	docker run -p 8888:8888 \
 		-d \
-		--name=$(PROJECT_NAME) \
+		--name=$(DOCKERTAG) \
 		-v `pwd`/data:/home/jovyan/work/data -v `pwd`/scripts:/home/jovyan/work/scripts -v `pwd`/output:/home/jovyan/work/output \
-		$(PROJECT_NAME) \
+		$(DOCKERTAG) \
 		start.sh jupyter lab --NotebookApp.token='' --NotebookApp.password=''
 	docker cp ../cppcserver.config $(PROJECT_NAME):/home/jovyan/
 else
-	@echo "There is already a container named $(PROJECT_NAME). Investigate with 'docker ps -a $(PROJECT_NAME)'. Use 'docker start $(PROJECT_NAME)' to restart it. Go to localhost:8888/lab if it's already running."
+	@echo "There is already a container named $(DOCKERTAG). Investigate with 'docker ps -a $(DOCKERTAG)'. Use 'docker start $(DOCKERTAG)' to restart it. Go to localhost:8888/lab if it's already running."
 endif
 
 
@@ -42,7 +43,7 @@ endif
 .PHONY : shell
 shell :
 ifneq ($(strip $(container_running)),) # don't launch if container exists
-	docker exec -it `docker ps -f name=$(PROJECT_NAME) -q` /bin/bash
+	docker exec -it `docker ps -f name=$(DOCKERTAG) -q` /bin/bash
 else
 	@echo "There is no running container. Run 'make dev' first."
 endif
