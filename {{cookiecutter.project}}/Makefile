@@ -1,7 +1,7 @@
 
 # use the name of the current directory as the docker image tag
 PROJECT_NAME = $(notdir $(PWD))
-DOCKERTAG = $(shell echo $(PROJECT_NAME) | tr '[:upper:]' '[:lower:]') #LOWERCASE DOCKERTAG
+DOCKERTAG = $(strip $(shell echo $(PROJECT_NAME) | tr '[:upper:]' '[:lower:]')) #LOWERCASE DOCKERTAG
 container_running = $(shell docker ps -f name=$(DOCKERTAG) -f status=running -q) # see if there are running containers rather than waiting for build and fail
 container_exists = $(shell docker ps -a -f name=$(DOCKERTAG) -q) # see if there are running containers rather than waiting for build and fail
 
@@ -15,7 +15,7 @@ help : Makefile
 ## build			: build plantcv docker image
 .PHONY : build
 build :
-	@echo Building $(PROJECT_NAME)...
+	@echo Building image $(DOCKERTAG) for project $(PROJECT_NAME)...
 ifeq ($(strip $(container_running)),) # don't build if container is running but rebuild if a container is exited
 	./build_docker.sh
 else
