@@ -33,7 +33,7 @@ ifeq ($(strip $(container_exists)),) # don't launch if container exists
 		-v `pwd`/data:/home/jovyan/work/data -v `pwd`/scripts:/home/jovyan/work/scripts -v `pwd`/output:/home/jovyan/work/output \
 		$(DOCKERTAG) \
 		start.sh jupyter lab --NotebookApp.token='' --NotebookApp.password=''
-	docker cp ../cppcserver.config $(PROJECT_NAME):/home/jovyan/
+	docker cp ../cppcserver.config $(DOCKERTAG):/home/jovyan/
 else
 	@echo "There is already a container named $(DOCKERTAG). Investigate with 'docker ps -a $(DOCKERTAG)'. Use 'docker start $(DOCKERTAG)' to restart it. Go to localhost:8888/lab if it's already running."
 endif
