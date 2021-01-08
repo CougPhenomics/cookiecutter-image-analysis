@@ -30,6 +30,9 @@ ifeq ($(strip $(container_exists)),) # don't launch if container exists
 	docker run -p 8888:8888 \
 		-d \
 		--name=$(DOCKERTAG) \
+		--user root \
+		-e NB_USER=jovyan -e NB_UID=$(shell id -u) -e NB_GID=$(shell id -g) -e NB_GROUP=$(shell id -gn) -e NB_UMASK=002 \
+		-e CHOWN_HOME=yes -e CHOWN_HOME_OPTS='-R' -e CHOWN_EXTRA='/home/jovyan/work' -e CHOWN_EXTRA_OPTS='-R' \
 		-v `pwd`/data:/home/jovyan/work/data -v `pwd`/scripts:/home/jovyan/work/scripts -v `pwd`/output:/home/jovyan/work/output \
 		$(DOCKERTAG) \
 		start.sh jupyter lab --NotebookApp.token='' --NotebookApp.password=''
@@ -43,7 +46,7 @@ endif
 .PHONY : shell
 shell :
 ifneq ($(strip $(container_running)),) # don't launch if container exists
-	docker exec -it `docker ps -f name=$(DOCKERTAG) -q` /bin/bash
+	docker exec -it `docker ps -f name=$(DOCKERTAG) -q` start.sh /bin/bash
 else
 	@echo "There is no running container. Run 'make dev' first."
 endif
