@@ -41,7 +41,7 @@ require(assertthat)
 walk(dir('src/R','.R$', full.names = T),source)
 
 knitr::opts_chunk$set(echo=F, results=F, fig.width = 10, warning=F, message=F)
-knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+knitr::opts_knit$set(root.dir = rprojroot::find_root_file(criterion = rprojroot::has_file('.here')))
 
 if(file.exists('reports/PostProcessing.html')){
   file.rename(from = 'reports/PostProcessing.html',
