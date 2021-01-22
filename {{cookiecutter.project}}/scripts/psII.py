@@ -156,7 +156,7 @@ def image_avg(fundf):
         # local_otsu = filters.rank.otsu(img, pcv.get_kernel((9,9), 'rectangle'))#morphology.disk(2))
         # thresh_image = img >= local_otsu
 
-        #_------>
+        #_------> start of mask
         elevation_map = filters.sobel(img)
         # pcv.plot_image(elevation_map)
         thresh = filters.threshold_otsu(image=img)
@@ -176,9 +176,12 @@ def image_avg(fundf):
         # pcv.plot_image(mask, cmap=plt.cm.nipy_spectral)
 
         # mask = pcv.erode(mask, 2, 1)
-        mask = pcv.fill(mask, 100)
+         if len(np.unique(mask))!=1:
+            mask = pcv.fill(mask, 100)
         # pcv.plot_image(mask, cmap=plt.cm.nipy_spectral)
-        # <-----------
+        # <----------- end of masking
+        
+        # roi needs to be defined regardless of mask
         roi_c, roi_h = pcv.roi.multi(img,
                                      coord=(250, 200),
                                      radius=70,
@@ -295,8 +298,8 @@ def image_avg(fundf):
             ithroi.append(int(i))  # append twice so each image has a value.
 
     else:
-        i = 1
-        rc = roi_c[i]
+#         i = 1
+#         rc = roi_c[i]
         for i, rc in enumerate(roi_c):
             # Store iteration Number
             ithroi.append(int(i))
