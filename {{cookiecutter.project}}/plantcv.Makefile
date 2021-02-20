@@ -1,7 +1,7 @@
 # Windows User --> If your R_USER directory is not C:\Users\<username>\Documents (which is the default) then you need to change it below
 # Required Inputs	: experiment name, start/end dates
 EXPER = {{cookiecutter.project}}
-STARTDATE = {% now 'utc', '%Y-%m-%d' %}
+STARTDATE = {{cookiecutter.start}}
 ENDDATE = {% now 'utc', '%Y-%m-%d' %}
 
 # Configs
