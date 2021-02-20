@@ -17,7 +17,7 @@ help : Makefile
 build :
 	@echo Building image $(DOCKERTAG) for project $(PROJECT_NAME)...
 ifeq ($(strip $(container_running)),) # don't build if container is running but rebuild if a container is exited
-	./build_docker.sh
+	sh build_docker.sh
 else
 	@echo "! Build script not run because a container with $(DOCKERTAG) is running."
 endif

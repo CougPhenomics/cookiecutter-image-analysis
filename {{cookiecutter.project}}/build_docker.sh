@@ -3,7 +3,7 @@
 
 # back up the environment.yml file just in case you run this script when you don't mean to
 mv -v environment.yml "environment.yml.$(date +'%Y%m%dT%H0000')" #2>/dev/null
-IMAGE_NAME=Chickpea-disease
+IMAGE_NAME={{cookiecutter.project}}
 DOCKERTAG="$(echo $IMAGE_NAME | tr '[:upper:]' '[:lower:]')" #dockertag must be lowercase
 docker build --no-cache -t $DOCKERTAG . #use no-cache to make sure pip install always runs
 docker run --rm \
