@@ -449,6 +449,7 @@ def image_avg(fundf):
     outdf['npq_avg'] = npq_avg
     outdf['yii_std'] = yii_std
     outdf['npq_std'] = npq_std
+    outdf['plantarea'] = plantarea
     outdf['obj_in_frame'] = inbounds
     outdf['unique_roi'] = isunique
 
@@ -469,9 +470,9 @@ if pcv.params.debug == 'print':
 
 # %% Testing dataframe
 # # If you need to test new function or threshold values you can subset your dataframe to analyze some images
-df2 = df.query(
-    '(plantbarcode=="A4") and (parameter == "FvFm" or parameter == "t300_ALon" or parameter == "t80_ALon") and (jobdate == "2020-06-01")'
-)
+# df2 = df.query(
+#     '(plantbarcode=="A4") and (parameter == "FvFm" or parameter == "t300_ALon" or parameter == "t80_ALon") and (jobdate == "2020-06-01")'
+# )
 # df2 = df.query('(plantbarcode=="A1") and (parameter == "FvFm" or parameter == "t300_ALon") and (jobdate == "2020-03-13")')# | (plantbarcode == "B7" & jobdate == "2019-11-20")')
 # fundf = df2.query('(plantbarcode == "A1" and parameter=="FvFm" and jobdate == "2020-05-30")')
 # del fundf
