@@ -16,8 +16,6 @@ from skimage import filters
 from skimage import morphology
 from skimage import segmentation
 
-# from tinydb import TinyDB, Query
-
 warnings.filterwarnings("ignore", module="matplotlib")
 warnings.filterwarnings("ignore", module='plotnine')
 
@@ -31,6 +29,8 @@ fluordir = os.path.join(outdir, 'fluorescence')
 os.makedirs(outdir, exist_ok=True)
 os.makedirs(debugdir, exist_ok=True)
 os.makedirs(maskdir, exist_ok=True)
+outfile = os.path.join(outdir,'output_psII_level0.csv')
+
 # %% pixel pixel_resolution
 # mm (this is approx and should only be used for scalebar)
 cppc.pixelresolution = 0.3
@@ -60,6 +60,28 @@ param_order = pimframes.parameter.unique()
 df['parameter'] = pd.Categorical(df.parameter,
                                  categories=param_order,
                                  ordered=True)
+
+# %% Check for existing output file and only analyze new files
+newheader = True
+defaultcols = df.columns.values.tolist()
+if os.path.exists(outfile):
+    # reading existing results file
+    existingdf = pd.read_csv(outfile)
+    # format dates consistently and NOT in data format becuase pandas doesn't handle datetimes well in merges(!?)...
+    existingdf.jobdate = pd.to_datetime(existingdf.jobdate).dt.strftime('%Y-%m-%d')
+    df.loc[:,'jobdate'] = df.jobdate.dt.strftime('%Y-%m-%d')
+    
+    # set common index
+    mergecols = ['plantbarcode','jobdate','frame','frameid','parameter']
+    df = df.set_index(mergecols)
+    existingdf = existingdf.set_index(mergecols)
+    
+    # filter and sort df
+    df = df[~df.index.isin(existingdf.index)].reset_index()
+    df.jobdate = pd.to_datetime(df.jobdate) #compatiability later
+    df = df[defaultcols]
+    newheader = False
+    
 # %% Setup Debug parmaeters
 # pcv.params.debug can be 'plot', 'print', or 'None'. 'plot' is useful if you are testing your pipeline over a few samples so you can see each step.
 pcv.params.debug = 'plot'  # 'print' #'plot', 'None'
@@ -515,6 +537,8 @@ df_avg2 = (pd.merge(df_avg, gtypeinfo, on=['plantbarcode', 'roi'],
                                               'output_psII_level0.csv'),
                                  na_rep='nan',
                                  float_format='%.4f',
-                                 index=False))
+                                 index=False,
+                                 mode='a',
+                                header=newheader))
 
 # %%
