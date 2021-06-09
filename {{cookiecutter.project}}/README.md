@@ -45,6 +45,8 @@ Use `make build` to build the docker image. You only need to do this once.
 
 Use `make dev` to launch a docker container running jupyter. Then you can use the browser to access the jupyter lab workspace on port 8888. You can either run it locally or on the server. Locally you would access it from `localhost:8888`. If you are using the server then go to `ipaddress:8888` where ipaddress is the address of the server. If you are off campus you need to be connected with a VPN. 
 
+If you get an error `Bind for 0.0.0.0:8888 failed: port is already allocated.` then you already have a docker instance running (maybe from a previous project?). You need to stop the instance with `docker stop <previous container name>`, remove the container you just made with `docker rm -f chickpea-disease` and rerun `make dev`
+
 Use `make shell` to launch a separate bash shell for the running container.
 
 ## Getting Started with the Analysis
@@ -96,6 +98,7 @@ You probably need to tweak the analysis scripts for peculiarities in your datase
 
 ### Post-Analysis Reports
 
+*TODO*
 You can check the results of the image analysis project by generating RMarkdown reports using `make dataquality` and `make wtdeviation`
 
 

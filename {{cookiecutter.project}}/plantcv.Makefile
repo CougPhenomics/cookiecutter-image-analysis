@@ -77,10 +77,9 @@ $(VIS_OUT) : $(VIS_PNG) $(VIS_WORKFLOW)
 	--delimiter "(.{2})-(.+)-(\d{8}T\d{6})-(.+)-(\d)" \
 	--timestampformat "%Y%m%dT%H%M%S" \
 	--meta plantbarcode,measurementlabel,timestamp,camera,id \
-	--cpu 6 \
+	--cpu 4 \
 	--writeimg \
 	--create \
-	--match plantbarcode:B1 \
 	--dates $(STARTDATE)_$(ENDDATE)
 
 # convert json output to csv if needed
