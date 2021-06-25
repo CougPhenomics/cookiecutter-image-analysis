@@ -178,27 +178,28 @@ def image_avg(fundf):
         # local_otsu = filters.rank.otsu(img, pcv.get_kernel((9,9), 'rectangle'))#morphology.disk(2))
         # thresh_image = img >= local_otsu
 
-        #_------> start of mask
-        elevation_map = filters.sobel(img)
-        # pcv.plot_image(elevation_map)
+#         #_------> start of mask
+#         elevation_map = filters.sobel(img)
+#         # pcv.plot_image(elevation_map)
         thresh = filters.threshold_otsu(image=img)
-        # thresh = 50
+#         # thresh = 50
 
-        markers = np.zeros_like(img, dtype='uint8')
-        markers[img > thresh + 8] = 2
-        markers[img <= thresh + 8] = 1
-        # pcv.plot_image(markers,cmap=plt.cm.nipy_spectral)
+#         markers = np.zeros_like(img, dtype='uint8')
+#         markers[img > thresh + 8] = 2
+#         markers[img <= thresh + 8] = 1
+#         # pcv.plot_image(markers,cmap=plt.cm.nipy_spectral)
 
-        mask = segmentation.watershed(elevation_map, markers)
-        mask = mask.astype(np.uint8)
-        # pcv.plot_image(mask)
+#         mask = segmentation.watershed(elevation_map, markers)
+#         mask = mask.astype(np.uint8)
+#         # pcv.plot_image(mask)
 
-        mask[mask == 1] = 0
-        mask[mask == 2] = 1
-        # pcv.plot_image(mask, cmap=plt.cm.nipy_spectral)
+#         mask[mask == 1] = 0
+#         mask[mask == 2] = 1
+#         # pcv.plot_image(mask, cmap=plt.cm.nipy_spectral)
 
         # mask = pcv.erode(mask, 2, 1)
-         if len(np.unique(mask))!=1:
+        mask = pcv.threshold.binary(img, thresh, 255)
+        if len(np.unique(mask))!=1:
             mask = pcv.fill(mask, 100)
         # pcv.plot_image(mask, cmap=plt.cm.nipy_spectral)
         # <----------- end of masking
